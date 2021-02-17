@@ -3,16 +3,32 @@ const quoteText = document.getElementById('quote');
 const authorText = document.getElementById('author');
 const twitter = document.getElementById('twitter');
 const newQuote = document.getElementById('new-quote');
+const loader = document.getElementById('loader');
+
+// Show loading //
+function loading() {
+    loader.hidden = false;
+    quoteContainer.hidden = true;
+}
+
+// Hide Loading //
+function complete() {
+    if(!loader.hidden) {
+        quoteContainer.hidden = false;
+        loader.hidden = true;
+    }
+}
 
 // Get Quote From API //
 async function getQuote() {
+    loading();
     const apiUrl = 'http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=json';
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
         // If there's no author, add Unknown //
-        if (data.quoteAuthor === 0) {
+        if (data.quoteAuthor.length === 0) {
             authorText.innerText = 'Unknown';
         } else {
             authorText.innerText = data.quoteAuthor;
@@ -25,6 +41,8 @@ async function getQuote() {
             quoteText.classList.remove('long-quote');
         }
         quoteText.innerText = data.quoteText;
+        // Stop Loader //
+        complete();
 
     } catch (err) {
         getQuote();
@@ -45,4 +63,4 @@ newQuote.addEventListener('click', getQuote);
 twitter.addEventListener('click', tweetQuote);
 
 // On Load //
-getQuote();
+getQuote()
